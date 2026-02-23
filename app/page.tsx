@@ -19,7 +19,7 @@ export default function HomePage() {
       {/* Logo */}
       <h1 className="text-5xl font-bold mb-8">
         <span className="text-green-600">Cari</span>
-        <span className="text-gray-900">Hadist</span>
+        <span className="text-gray-900">Hadits</span>
       </h1>
 
       {/* Search Form */}
@@ -29,7 +29,7 @@ export default function HomePage() {
       >
         <input
           type="text"
-          placeholder="Cari hadist... (contoh: shalat, sabar, iman)"
+          placeholder="Cari hadits... (contoh: shalat, sabar, iman)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full border border-gray-300 rounded-full px-6 py-4 text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"

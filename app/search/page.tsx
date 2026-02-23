@@ -1,81 +1,190 @@
-import Link from "next/link";
-import { getHadithRange } from "@/lib/api";
+"use client";
 
-interface Props {
-  searchParams: {
-    q?: string;
-  };
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+
+interface Hadith {
+  number: number;
+  id: string;
+  arab: string;
 }
 
-export default async function SearchPage({ searchParams }: Props) {
-  const query = searchParams.q || "";
+interface Book {
+  id: string;
+  name: string;
+  hadiths: Hadith[];
+}
 
-  // sementara masih ambil dari Bukhari range 1-100
-  const response = await getHadithRange("bukhari", 1, 100);
-
-  const book = response.data;
-
-  const filtered = book.hadiths.filter((item) =>
-    item.id.toLowerCase().includes(query.toLowerCase())
+// Fungsi fetch API
+async function getHadithRange(book: string, start: number, end: number) {
+  const res = await fetch(
+    `https://api.hadith.gading.dev/books/${book}?range=${start}-${end}`
   );
+  if (!res.ok) throw new Error("Gagal fetch hadits");
+  return res.json();
+}
+
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const queryParam = searchParams.get("q") || "";
+
+  const [inputValue, setInputValue] = useState(queryParam); // diikat ke input
+  const [searchQuery, setSearchQuery] = useState(queryParam); // digunakan untuk fetch
+  const [results, setResults] = useState<Hadith[]>([]);
+  const [bookName, setBookName] = useState("Bukhari");
+  const [loading, setLoading] = useState(false);
+
+  const formatBrackets = (text: string) => {
+    const regex = /\[([^\]]+)\]/g;
+    const parts: (string | React.ReactNode)[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const index = match.index;
+      if (index > lastIndex) {
+        parts.push(text.slice(lastIndex, index));
+      }
+      parts.push(<strong key={index}>{match[1]}</strong>);
+      lastIndex = index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts;
+  };
+
+  // Fetch hanya ketika searchQuery berubah
+  useEffect(() => {
+    if (!searchQuery) {
+      setResults([]);
+      return;
+    }
+
+    const fetchHadith = async () => {
+      setLoading(true);
+      try {
+        const response: any = await getHadithRange("bukhari", 1, 100);
+
+        // ambil hadiths dari response.data.hadiths
+        const hadiths: Hadith[] = response.data?.hadiths ?? [];
+
+        const keywords = searchQuery.toLowerCase().trim().split(" ");
+
+        const filtered = hadiths.filter((item) =>
+          keywords.every((k) => item.id.toLowerCase().includes(k))
+        );
+
+        setResults(filtered);
+      } catch (err) {
+        console.error(err);
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHadith();
+  }, [searchQuery]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(inputValue);
+    router.push(`/search?q=${encodeURIComponent(inputValue)}`);
+  };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
+    <main className="min-h-screen bg-white px-6 py-10">
       <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Cari Hadits</h1>
 
-        {/* Header */}
-        <h1 className="text-3xl font-bold mb-2">
-          Hasil Pencarian
-        </h1>
-        <p className="text-gray-500 mb-8">
-          "{query}" ditemukan {filtered.length} hadist di {book.name}
-        </p>
+        {/* Form input search */}
+        <form onSubmit={handleSubmit} className="flex mb-8 gap-2">
+          <input
+            type="text"
+            placeholder="Masukkan kata kunci..."
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+          >
+            Cari
+          </button>
+        </form>
 
-        {/* Jika kosong */}
-        {filtered.length === 0 && (
-          <div className="bg-white p-10 rounded-xl shadow text-center">
+        {/* Info hasil */}
+        {searchQuery && (
+          <p className="text-gray-500 mb-6">
+            "{searchQuery}" ditemukan {results.length} hadits di {bookName}
+          </p>
+        )}
+
+        {loading && <p className="text-center text-gray-500">Mencari hadits...</p>}
+
+        {!loading && searchQuery && results.length === 0 && (
+          <div className="bg-gray-50 p-10 rounded-xl shadow text-center">
             <p className="text-gray-500 text-lg">
-              Tidak ditemukan hasil untuk "{query}"
+              Tidak ditemukan hasil untuk "{searchQuery}"
             </p>
           </div>
         )}
 
-        {/* Results */}
-        <div className="space-y-8">
-          {filtered.map((item) => (
-            <div
-              key={item.number}
-              className="bg-white p-8 rounded-xl shadow hover:shadow-lg transition"
-            >
-              {/* Header Card */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-semibold text-lg text-green-700">
-                  {book.name} No. {item.number}
+        {!loading && results.length > 0 && (
+          <div className="space-y-8">
+            {results.map((item) => (
+              <div
+                key={item.number}
+                className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition border"
+              >
+                {/* Header */}
+                <h2 className="font-semibold text-green-700 mb-4">
+                  {bookName} No. {item.number}
                 </h2>
 
-                {item?.number && (
- <Link
-  href={`/book/${book.id}/${item.number}`}
-  className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 hover:shadow transition"
->
-  Lihat Detail
-</Link>
-)}
+                {/* Arab (dibatasi 2 baris) */}
+                <p
+                  className="text-2xl text-right leading-loose mb-4"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    direction: "rtl",
+                    unicodeBidi: "bidi-override",
+                  }}
+                >
+                  {item.arab}
+                </p>
+
+                {/* Divider */}
+                <div className="h-px bg-gray-200 mb-4" />
+
+                {/* Terjemahan (dibatasi 3 baris) */}
+                <p className="text-gray-600 text-sm line-clamp-3 mb-6">
+                  {formatBrackets(item.id)}
+                </p>
+
+                {/* Button */}
+                <div className="flex justify-end">
+                  <Link
+                    href={`/lists/bukhari/${item.number}`}
+                    className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition text-sm cursor-pointer"
+                  >
+                    Lihat Detail →
+                  </Link>
+                </div>
               </div>
-
-              {/* Arab */}
-              <p className="text-2xl leading-loose text-right mb-6">
-                {item.arab}
-              </p>
-
-              {/* Terjemahan */}
-              <p className="text-gray-700 leading-relaxed text-justify">
-                {item.id}
-              </p>
-            </div>
-          ))}
-        </div>
-
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
