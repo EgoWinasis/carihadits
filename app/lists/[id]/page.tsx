@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import React from "react";
 
 export default function Lists() {
   const params = useParams();
@@ -14,24 +15,26 @@ export default function Lists() {
   const limit = 10;
  // Fungsi untuk bold teks dalam kurung siku []
   const formatBrackets = (text: string) => {
-    const regex = /\[([^\]]+)\]/g;
-    const parts: (string | JSX.Element)[] = [];
-    let lastIndex = 0;
-    let match;
+  const regex = /\[([^\]]+)\]/g;
+  const parts: (string | React.ReactNode)[] = [];
+  let lastIndex = 0;
+  let match;
 
-    while ((match = regex.exec(text)) !== null) {
-      const index = match.index;
-      if (index > lastIndex) {
-        parts.push(text.slice(lastIndex, index));
-      }
-      parts.push(<strong key={index}>{match[1]}</strong>);
-      lastIndex = index + match[0].length;
+  while ((match = regex.exec(text)) !== null) {
+    const index = match.index;
+    if (index > lastIndex) {
+      parts.push(text.slice(lastIndex, index));
     }
-    if (lastIndex < text.length) {
-      parts.push(text.slice(lastIndex));
-    }
-    return parts;
-  };
+    parts.push(<strong key={index}>{match[1]}</strong>);
+    lastIndex = index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts;
+};
 
   useEffect(() => {
     if (!id) return;
