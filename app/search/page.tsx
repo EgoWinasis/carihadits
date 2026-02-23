@@ -35,14 +35,12 @@ export default function SearchPage() {
   const limit = 300;
   const [totalPages, setTotalPages] = useState(1);
 
-  // Load daftar buku
   useEffect(() => {
     const loadBooks = async () => {
       try {
         const res: any = await fetchBooks();
         const data: BookMeta[] = res.data ?? [];
         setBooks(data);
-
         const defaultBook = data.find(b => b.id === selectedBook);
         if (defaultBook) setTotalPages(Math.ceil(defaultBook.available / limit));
       } catch (e) {
@@ -52,7 +50,6 @@ export default function SearchPage() {
     loadBooks();
   }, []);
 
-  // Ambil query dari URL saat pertama load
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -77,7 +74,6 @@ export default function SearchPage() {
     return parts;
   };
 
-  // Fetch hadits ketika searchQuery, page, atau selectedBook berubah
   useEffect(() => {
     if (!searchQuery) return;
 
@@ -126,11 +122,12 @@ export default function SearchPage() {
   const bookMeta = books.find(b => b.id === selectedBook);
 
   return (
-    <main className="min-h-screen bg-white px-6 py-10">
+    <main className="min-h-screen bg-white px-4 sm:px-6 py-10">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Cari Hadits</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">Cari Hadits</h1>
 
-        <form onSubmit={handleSubmit} className="flex mb-8 gap-2">
+        {/* Form Search */}
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row mb-8 gap-2 sm:gap-2 items-stretch">
           <input
             type="text"
             placeholder="Masukkan kata kunci..."
@@ -142,21 +139,21 @@ export default function SearchPage() {
           <select
             value={selectedBook}
             onChange={handleBookChange}
-            className="border rounded-lg px-3 cursor-pointer"
+            className="border rounded-lg px-3 py-2 cursor-pointer sm:w-48"
           >
             {books.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
 
           <button
             type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition sm:w-auto w-full"
           >
             Cari
           </button>
         </form>
 
         {searchQuery && (
-          <p className="text-gray-500 mb-4">
+          <p className="text-gray-500 mb-4 text-sm sm:text-base">
             “{searchQuery}” ditemukan {results.length} hadits di {bookMeta?.name || selectedBook} dari data {(page-1)*limit+1}–{Math.min(page*limit, bookMeta?.available || page*limit)} ( Total {bookMeta?.available || "?"} hadits )
           </p>
         )}
@@ -164,23 +161,23 @@ export default function SearchPage() {
         {loading && <p className="text-center text-gray-500">Mencari hadits...</p>}
 
         {!loading && results.length === 0 && searchQuery && (
-          <div className="bg-gray-50 p-10 rounded-xl shadow text-center">
-            <p className="text-gray-500 text-lg">
+          <div className="bg-gray-50 p-8 sm:p-10 rounded-xl shadow text-center">
+            <p className="text-gray-500 text-sm sm:text-lg">
               Tidak ditemukan hasil di halaman {page}.
             </p>
           </div>
         )}
 
         {!loading && results.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {results.map(item => (
-              <div key={item.number} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition border">
-                <h2 className="font-semibold text-green-700 mb-4">
+              <div key={item.number} className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-lg transition border">
+                <h2 className="font-semibold text-green-700 mb-2 sm:mb-4 text-sm sm:text-base">
                   {bookMeta?.name} No. {item.number}
                 </h2>
 
                 <p
-                  className="text-2xl text-right leading-loose mb-4"
+                  className="text-lg sm:text-2xl text-right leading-relaxed mb-2 sm:mb-4"
                   style={{
                     display: "-webkit-box",
                     WebkitLineClamp: 2,
@@ -194,16 +191,16 @@ export default function SearchPage() {
                   {item.arab}
                 </p>
 
-                <div className="h-px bg-gray-200 mb-4" />
+                <div className="h-px bg-gray-200 mb-2 sm:mb-4" />
 
-                <p className="text-gray-600 text-sm line-clamp-3 mb-6">
+                <p className="text-gray-600 text-xs sm:text-sm line-clamp-3 mb-4 sm:mb-6">
                   {formatBrackets(item.id)}
                 </p>
 
                 <div className="flex justify-end">
                   <Link
                     href={`/lists/${selectedBook}/${item.number}`}
-                    className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition text-sm"
+                    className="px-3 sm:px-4 py-1 sm:py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition text-xs sm:text-sm"
                   >
                     Lihat Detail →
                   </Link>
@@ -214,28 +211,28 @@ export default function SearchPage() {
         )}
 
         {/* Sticky Floating Pagination */}
-        <div className="sticky bottom-4 mt-16 flex justify-center z-10">
+        <div className="sticky bottom-4 mt-10 sm:mt-16 flex justify-center z-10">
           <div className="bg-white border shadow-lg rounded-full 
-                          px-4 sm:px-6 py-2 sm:py-3 
-                          flex items-center gap-2 sm:gap-4
+                          px-2 sm:px-4 py-2 sm:py-3 
+                          flex items-center gap-1 sm:gap-3
                           max-w-full overflow-x-auto">
 
             {/* Prev */}
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 sm:px-4 py-2 
+              className="px-2 sm:px-3 py-1 sm:py-2 
                          bg-gray-200 rounded-full 
                          hover:bg-gray-300 
                          disabled:opacity-50 
                          transition cursor-pointer
-                         text-sm sm:text-base"
+                         text-xs sm:text-sm"
             >
               Prev
             </button>
 
             {/* Page Info */}
-            <span className="font-medium whitespace-nowrap text-sm sm:text-base">
+            <span className="font-medium whitespace-nowrap text-xs sm:text-sm">
               {page} / {totalPages}
             </span>
 
@@ -245,20 +242,13 @@ export default function SearchPage() {
               min={1}
               max={totalPages}
               placeholder="Go"
-              className="w-14 sm:w-20 
-                         px-2 sm:px-3 py-2 
-                         border rounded-full text-center 
-                         text-sm sm:text-base
-                         focus:outline-none 
-                         focus:ring-2 focus:ring-green-500"
+              className="w-12 sm:w-16 px-1 sm:px-2 py-1 sm:py-2 border rounded-full text-center text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   const value = Number(
                     (e.target as HTMLInputElement).value
                   );
-                  if (value >= 1 && value <= totalPages) {
-                    setPage(value);
-                  }
+                  if (value >= 1 && value <= totalPages) setPage(value);
                 }
               }}
             />
@@ -269,12 +259,12 @@ export default function SearchPage() {
                 setPage((p) => Math.min(p + 1, totalPages))
               }
               disabled={page === totalPages}
-              className="px-3 sm:px-4 py-2 
+              className="px-2 sm:px-3 py-1 sm:py-2 
                          bg-green-600 text-white rounded-full 
                          hover:bg-green-700 
                          disabled:opacity-50 
                          transition cursor-pointer
-                         text-sm sm:text-base"
+                         text-xs sm:text-sm"
             >
               Next →
             </button>
