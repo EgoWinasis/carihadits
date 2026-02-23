@@ -1,86 +1,55 @@
 "use client";
-
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-interface Hadith {
-  number: number;
-  id: string;
-  arab: string;
-}
+interface Hadith { number: number; id: string; arab: string; }
 
-interface Book {
-  id: string;
-  name: string;
-  hadiths: Hadith[];
-}
-
-// Fungsi fetch API
 async function getHadithRange(book: string, start: number, end: number) {
-  const res = await fetch(
-    `https://api.hadith.gading.dev/books/${book}?range=${start}-${end}`
-  );
+  const res = await fetch(`https://api.hadith.gading.dev/books/${book}?range=${start}-${end}`);
   if (!res.ok) throw new Error("Gagal fetch hadits");
   return res.json();
 }
 
 export default function SearchPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const queryParam = searchParams.get("q") || "";
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
 
-  const [inputValue, setInputValue] = useState(queryParam); // diikat ke input
-  const [searchQuery, setSearchQuery] = useState(queryParam); // digunakan untuk fetch
+  const [inputValue, setInputValue] = useState(initialQuery);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [results, setResults] = useState<Hadith[]>([]);
-  const [bookName, setBookName] = useState("Bukhari");
   const [loading, setLoading] = useState(false);
+  const bookName = "Bukhari";
 
   const formatBrackets = (text: string) => {
     const regex = /\[([^\]]+)\]/g;
     const parts: (string | React.ReactNode)[] = [];
-    let lastIndex = 0;
-    let match;
-
+    let lastIndex = 0, match;
     while ((match = regex.exec(text)) !== null) {
       const index = match.index;
-      if (index > lastIndex) {
-        parts.push(text.slice(lastIndex, index));
-      }
+      if (index > lastIndex) parts.push(text.slice(lastIndex, index));
       parts.push(<strong key={index}>{match[1]}</strong>);
       lastIndex = index + match[0].length;
     }
-
-    if (lastIndex < text.length) {
-      parts.push(text.slice(lastIndex));
-    }
-
+    if (lastIndex < text.length) parts.push(text.slice(lastIndex));
     return parts;
   };
 
-  // Fetch hanya ketika searchQuery berubah
+  // Fetch ketika searchQuery berubah
   useEffect(() => {
-    if (!searchQuery) {
-      setResults([]);
-      return;
-    }
-
+    if (!searchQuery) return;
     const fetchHadith = async () => {
       setLoading(true);
       try {
         const response: any = await getHadithRange("bukhari", 1, 100);
-
-        // ambil hadiths dari response.data.hadiths
         const hadiths: Hadith[] = response.data?.hadiths ?? [];
-
         const keywords = searchQuery.toLowerCase().trim().split(" ");
-
         const filtered = hadiths.filter((item) =>
           keywords.every((k) => item.id.toLowerCase().includes(k))
         );
-
         setResults(filtered);
       } catch (err) {
         console.error(err);
@@ -89,9 +58,16 @@ export default function SearchPage() {
         setLoading(false);
       }
     };
-
     fetchHadith();
   }, [searchQuery]);
+
+  // Update inputValue dan searchQuery saat URL berubah (misal dari home)
+  useEffect(() => {
+    if (initialQuery && initialQuery !== searchQuery) {
+      setInputValue(initialQuery);
+      setSearchQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +80,6 @@ export default function SearchPage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Cari Hadits</h1>
 
-        {/* Form input search */}
         <form onSubmit={handleSubmit} className="flex mb-8 gap-2">
           <input
             type="text"
@@ -121,7 +96,6 @@ export default function SearchPage() {
           </button>
         </form>
 
-        {/* Info hasil */}
         {searchQuery && (
           <p className="text-gray-500 mb-6">
             "{searchQuery}" ditemukan {results.length} hadits di {bookName}
@@ -145,12 +119,9 @@ export default function SearchPage() {
                 key={item.number}
                 className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition border"
               >
-                {/* Header */}
                 <h2 className="font-semibold text-green-700 mb-4">
                   {bookName} No. {item.number}
                 </h2>
-
-                {/* Arab (dibatasi 2 baris) */}
                 <p
                   className="text-2xl text-right leading-loose mb-4"
                   style={{
@@ -165,16 +136,10 @@ export default function SearchPage() {
                 >
                   {item.arab}
                 </p>
-
-                {/* Divider */}
                 <div className="h-px bg-gray-200 mb-4" />
-
-                {/* Terjemahan (dibatasi 3 baris) */}
                 <p className="text-gray-600 text-sm line-clamp-3 mb-6">
                   {formatBrackets(item.id)}
                 </p>
-
-                {/* Button */}
                 <div className="flex justify-end">
                   <Link
                     href={`/lists/bukhari/${item.number}`}
