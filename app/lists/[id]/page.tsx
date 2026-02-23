@@ -91,20 +91,28 @@ export default function Lists() {
       </div>
 
       {/* Sticky Floating Pagination */}
-<div className="sticky bottom-6 mt-16 flex justify-center">
-  <div className="bg-white border shadow-lg rounded-full px-6 py-3 flex flex-wrap items-center gap-4">
+<div className="sticky bottom-4 mt-16 flex justify-center z-10">
+  <div className="bg-white border shadow-lg rounded-full 
+                  px-4 sm:px-6 py-2 sm:py-3 
+                  flex items-center gap-2 sm:gap-4
+                  max-w-full overflow-x-auto">
 
     {/* Prev */}
     <button
       onClick={() => setPage((p) => Math.max(p - 1, 1))}
       disabled={page === 1}
-      className="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50 cursor-pointer transition"
+      className="px-3 sm:px-4 py-2 
+                 bg-gray-200 rounded-full 
+                 hover:bg-gray-300 
+                 disabled:opacity-50 
+                 transition cursor-pointer
+                 text-sm sm:text-base"
     >
       Prev
     </button>
 
     {/* Page Info */}
-    <span className="font-medium whitespace-nowrap">
+    <span className="font-medium whitespace-nowrap text-sm sm:text-base">
       {page} / {totalPages}
     </span>
 
@@ -114,7 +122,12 @@ export default function Lists() {
       min={1}
       max={totalPages}
       placeholder="Go"
-      className="w-20 px-3 py-2 border rounded-full text-center focus:outline-none focus:ring-2 focus:ring-green-500"
+      className="w-14 sm:w-20 
+                 px-2 sm:px-3 py-2 
+                 border rounded-full text-center 
+                 text-sm sm:text-base
+                 focus:outline-none 
+                 focus:ring-2 focus:ring-green-500"
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           const value = Number(
@@ -133,7 +146,12 @@ export default function Lists() {
         setPage((p) => Math.min(p + 1, totalPages))
       }
       disabled={page === totalPages}
-      className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 disabled:opacity-50 cursor-pointer transition"
+      className="px-3 sm:px-4 py-2 
+                 bg-green-600 text-white rounded-full 
+                 hover:bg-green-700 
+                 disabled:opacity-50 
+                 transition cursor-pointer
+                 text-sm sm:text-base"
     >
       Next
     </button>
