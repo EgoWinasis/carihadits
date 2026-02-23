@@ -1,5 +1,5 @@
 // app/lists/[id]/[number]/page.tsx
-"use client"; // dibutuhkan untuk router.back()
+"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -25,13 +25,33 @@ interface ApiResponse {
 export default function HadithDetail() {
   const params = useParams();
   const router = useRouter();
-
-  const { id, number } = params; // id = darimi, number = 1
+  const { id, number } = params;
 
   const [hadith, setHadith] = useState<Hadith | null>(null);
   const [bookName, setBookName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Fungsi untuk bold teks dalam kurung siku []
+  const formatBrackets = (text: string) => {
+    const regex = /\[([^\]]+)\]/g;
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const index = match.index;
+      if (index > lastIndex) {
+        parts.push(text.slice(lastIndex, index));
+      }
+      parts.push(<strong key={index}>{match[1]}</strong>);
+      lastIndex = index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    return parts;
+  };
 
   useEffect(() => {
     async function fetchHadith() {
@@ -57,7 +77,8 @@ export default function HadithDetail() {
   }, [id, number]);
 
   if (loading) return <p className="text-center mt-10">Memuat hadits...</p>;
-  if (error || !hadith) return <p className="text-center mt-10 text-red-600">{error}</p>;
+  if (error || !hadith)
+    return <p className="text-center mt-10 text-red-600">{error}</p>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-8">
@@ -81,7 +102,9 @@ export default function HadithDetail() {
 
       {/* Terjemahan */}
       <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200">
-        <p className="text-gray-800 text-lg leading-relaxed text-justify">{hadith.id}</p>
+        <p className="text-gray-800 text-lg leading-relaxed text-justify">
+          {formatBrackets(hadith.id)}
+        </p>
       </div>
 
       {/* Tombol kembali */}

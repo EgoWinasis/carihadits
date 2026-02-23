@@ -12,6 +12,26 @@ export default function Lists() {
   const [page, setPage] = useState(1);
 
   const limit = 10;
+ // Fungsi untuk bold teks dalam kurung siku []
+  const formatBrackets = (text: string) => {
+    const regex = /\[([^\]]+)\]/g;
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const index = match.index;
+      if (index > lastIndex) {
+        parts.push(text.slice(lastIndex, index));
+      }
+      parts.push(<strong key={index}>{match[1]}</strong>);
+      lastIndex = index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+    return parts;
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -98,7 +118,7 @@ export default function Lists() {
 
                 {/* Terjemahan (dibatasi) */}
                 <p className="text-gray-600 text-sm line-clamp-3 mb-6">
-                    {item.id}
+                     {formatBrackets(item.id)}
                 </p>
 
                 {/* Button */}

@@ -10,7 +10,7 @@ export default async function Books() {
 
         {/* Title */}
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Daftar Kitab Hadist
+          Daftar Kitab Hadits
         </h1>
 
         {/* Book Cards */}
@@ -25,7 +25,7 @@ export default async function Books() {
                 {book.name}
               </h2>
               <p className="mt-2 text-gray-600">
-                Total hadist: {book.available}
+                Total hadits: {book.available}
               </p>
             </Link>
           ))}
