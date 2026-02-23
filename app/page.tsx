@@ -38,7 +38,7 @@ export default function HomePage() {
         <div className="flex justify-center gap-4 mt-6">
           <button
             type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
           >
             Cari Hadits
           </button>
