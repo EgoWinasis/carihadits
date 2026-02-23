@@ -1,0 +1,144 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+export default function Lists() {
+  const params = useParams();
+  const id = params?.id as string;
+
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+
+  const limit = 10;
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+
+      const start = (page - 1) * limit + 1;
+      const end = page * limit;
+
+      try {
+        const res = await fetch(
+          `https://api.hadith.gading.dev/books/${id.toLowerCase()}?range=${start}-${end}`
+        );
+
+        const json = await res.json();
+        setData(json);
+
+        // Scroll ke atas setiap ganti halaman
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id, page]);
+
+  if (loading)
+    return <div className="text-center py-20">Loading...</div>;
+
+  if (!data?.data?.hadiths)
+    return (
+      <div className="text-center py-20 text-red-600">
+        Gagal mengambil data
+      </div>
+    );
+
+  const hadiths = data.data.hadiths;
+  const bookName = data.data.name;
+  const totalAvailable = data.data.available;
+
+  const totalPages = Math.ceil(totalAvailable / limit);
+
+  return (
+    <main className="flex-grow px-6 py-12 pb-32">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-10 text-center">
+          Kitab {bookName}
+        </h1>
+
+        {/* List Hadith */}
+        <div className="space-y-10">
+          {hadiths.map((item: any) => (
+            <div
+              key={item.number}
+              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition border"
+            >
+              <h2 className="font-semibold text-lg text-green-700 mb-6">
+                {bookName} No. {item.number}
+              </h2>
+
+              <p className="text-3xl leading-loose text-right mb-8">
+                {item.arab}
+              </p>
+
+              <div className="h-px bg-gray-200 mb-6" />
+
+              <p className="text-gray-700 text-justify leading-relaxed">
+                {item.id}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sticky Floating Pagination */}
+<div className="sticky bottom-6 mt-16 flex justify-center">
+  <div className="bg-white border shadow-lg rounded-full px-6 py-3 flex flex-wrap items-center gap-4">
+
+    {/* Prev */}
+    <button
+      onClick={() => setPage((p) => Math.max(p - 1, 1))}
+      disabled={page === 1}
+      className="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50 cursor-pointer transition"
+    >
+      Prev
+    </button>
+
+    {/* Page Info */}
+    <span className="font-medium whitespace-nowrap">
+      {page} / {totalPages}
+    </span>
+
+    {/* Input */}
+    <input
+      type="number"
+      min={1}
+      max={totalPages}
+      placeholder="Go"
+      className="w-20 px-3 py-2 border rounded-full text-center focus:outline-none focus:ring-2 focus:ring-green-500"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          const value = Number(
+            (e.target as HTMLInputElement).value
+          );
+          if (value >= 1 && value <= totalPages) {
+            setPage(value);
+          }
+        }
+      }}
+    />
+
+    {/* Next */}
+    <button
+      onClick={() =>
+        setPage((p) => Math.min(p + 1, totalPages))
+      }
+      disabled={page === totalPages}
+      className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 disabled:opacity-50 cursor-pointer transition"
+    >
+      Next
+    </button>
+  </div>
+</div>
+    </main>
+  );
+}
