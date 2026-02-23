@@ -66,27 +66,53 @@ export default function Lists() {
         </h1>
 
         {/* List Hadith */}
-        <div className="space-y-10">
-          {hadiths.map((item: any) => (
-            <div
-              key={item.number}
-              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition border"
-            >
-              <h2 className="font-semibold text-lg text-green-700 mb-6">
-                {bookName} No. {item.number}
-              </h2>
+        <div className="space-y-8">
+            {hadiths.map((item: any) => (
+                <div
+                key={item.number}
+                className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition border"
+                >
+                {/* Header */}
+                <h2 className="font-semibold text-green-700 mb-4">
+                    {bookName} No. {item.number}
+                </h2>
 
-              <p className="text-3xl leading-loose text-right mb-8">
+                {/* Arab (dibatasi) */}
+                <p
+                className="text-2xl text-right leading-loose mb-4"
+                style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    direction: 'rtl',       // penting untuk teks Arab
+                    unicodeBidi: 'bidi-override', // memastikan ellipsis muncul
+                }}
+                >
                 {item.arab}
-              </p>
+                </p>
 
-              <div className="h-px bg-gray-200 mb-6" />
+                {/* Divider */}
+                <div className="h-px bg-gray-200 mb-4" />
 
-              <p className="text-gray-700 text-justify leading-relaxed">
-                {item.id}
-              </p>
-            </div>
-          ))}
+                {/* Terjemahan (dibatasi) */}
+                <p className="text-gray-600 text-sm line-clamp-3 mb-6">
+                    {item.id}
+                </p>
+
+                {/* Button */}
+                <div className="flex justify-end">
+                    <a
+                    href={`/lists/${id}/${item.number}`}
+                    className="px-4 py-2 bg-green-600 text-white rounded-full 
+                                hover:bg-green-700 transition text-sm cursor-pointer"
+                    >
+                    Lihat Detail →
+                    </a>
+                </div>
+                </div>
+            ))}
         </div>
       </div>
 

@@ -6,11 +6,11 @@ export default function AboutPage() {
         {/* Title Card */}
         <div className="bg-gray-50 p-8 rounded-2xl shadow">
           <h1 className="text-4xl font-bold mb-4">
-            Tentang <span className="text-green-600">CariHadist</span>
+            Tentang <span className="text-green-600">CariHadits</span>
           </h1>
           <p className="text-gray-700 leading-relaxed">
-            CariHadist adalah platform pencarian hadist digital yang
-            memudahkan siapa saja dalam menemukan hadist dengan cepat,
+            CariHadits adalah platform pencarian hadits digital yang
+            memudahkan siapa saja dalam menemukan hadits dengan cepat,
             mudah, dan akurat. Dirancang dengan tampilan modern dan
             sederhana agar nyaman digunakan oleh semua kalangan.
           </p>
@@ -24,7 +24,7 @@ export default function AboutPage() {
               Visi
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              Menjadi platform pencarian hadist digital yang modern,
+              Menjadi platform pencarian hadits digital yang modern,
               terpercaya, dan mudah diakses oleh seluruh umat Islam.
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function AboutPage() {
               Misi
             </h2>
             <ul className="text-gray-700 space-y-2 list-disc list-inside">
-              <li>Menyediakan akses hadist yang cepat dan akurat</li>
+              <li>Menyediakan akses hadits yang cepat dan akurat</li>
               <li>Menghadirkan pengalaman pengguna yang nyaman</li>
               <li>Mendukung pembelajaran dan dakwah digital</li>
             </ul>
@@ -47,7 +47,7 @@ export default function AboutPage() {
         {/* Closing Card */}
         <div className="bg-gray-50 p-8 rounded-2xl shadow text-center hover:shadow-md transition">
           <p className="text-gray-600 leading-relaxed">
-            Semoga <span className="font-semibold text-green-600">CariHadist </span> 
+            Semoga <span className="font-semibold text-green-600">CariHadits </span> 
              dapat menjadi sarana yang bermanfaat dalam memperdalam ilmu
             dan mengamalkan ajaran Rasulullah ﷺ.
           </p>
