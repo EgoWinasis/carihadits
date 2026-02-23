@@ -14,7 +14,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-center bg-white px-4">
+    <div className=" bg-white flex-grow flex flex-col items-center justify-center bg-white px-4">
 
       {/* Logo */}
       <h1 className="text-5xl font-bold mb-8">

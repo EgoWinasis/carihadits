@@ -1,6 +1,6 @@
 export default function AboutPage() {
   return (
-    <main className="  px-6 py-16">
+    <main className=" bg-white px-6 py-16">
       <div className="max-w-5xl mx-auto space-y-8">
 
         {/* Title Card */}

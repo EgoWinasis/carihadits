@@ -5,7 +5,7 @@ export default async function Books() {
   const result = await getBooksList();
 
   return (
-    <main className="flex-grow px-6 py-12 ">
+    <main className=" bg-white flex-grow px-6 py-12 ">
       <div className="max-w-5xl mx-auto">
 
         {/* Title */}

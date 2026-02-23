@@ -14,7 +14,7 @@ import {
 
 export default function ContactPage() {
   return (
-    <div className="flex-grow flex items-center justify-center px-6 py-16 ">
+    <div className=" bg-white flex-grow flex items-center justify-center px-6 py-16 ">
 
       <div className="w-full max-w-md bg-gray-50 p-10 rounded-2xl shadow-lg text-center space-y-8 border">
 
