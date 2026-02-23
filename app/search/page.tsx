@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Hadith { number: number; id: string; arab: string; }
@@ -15,14 +15,23 @@ async function getHadithRange(book: string, start: number, end: number) {
 
 export default function SearchPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
 
-  const [inputValue, setInputValue] = useState(initialQuery);
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [inputValue, setInputValue] = useState("");      // input form
+  const [searchQuery, setSearchQuery] = useState("");    // fetch query
   const [results, setResults] = useState<Hadith[]>([]);
   const [loading, setLoading] = useState(false);
   const bookName = "Bukhari";
+
+  // Ambil query dari URL saat halaman pertama kali load (client-side)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q") || "";
+    if (q) {
+      setInputValue(q);
+      setSearchQuery(q);
+    }
+  }, []);
 
   const formatBrackets = (text: string) => {
     const regex = /\[([^\]]+)\]/g;
@@ -38,7 +47,6 @@ export default function SearchPage() {
     return parts;
   };
 
-  // Fetch ketika searchQuery berubah
   useEffect(() => {
     if (!searchQuery) return;
     const fetchHadith = async () => {
@@ -60,14 +68,6 @@ export default function SearchPage() {
     };
     fetchHadith();
   }, [searchQuery]);
-
-  // Update inputValue dan searchQuery saat URL berubah (misal dari home)
-  useEffect(() => {
-    if (initialQuery && initialQuery !== searchQuery) {
-      setInputValue(initialQuery);
-      setSearchQuery(initialQuery);
-    }
-  }, [initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
